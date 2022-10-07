@@ -8,9 +8,12 @@
 
 Необходимые файлы для работы:
 
+1. build-docker-image.sh (для сборки контейнера Astra Linux)
+2. example.py (для запуска стенда mininet)
+
 ```
-build-docker-image.sh (для сборки контейнера Astra Linux)
-example.py (для запуска стенда mininet)
+git clone https://github.com/LovingFox/astra_mininet.git
+cd astra_mininet
 ```
 
 ### Сборка образа Astra Linux
