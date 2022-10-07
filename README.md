@@ -228,7 +228,7 @@ exit
 
 ```
 show ip route
-show ip route ospf
-show ip ospf neighbor
-show ip ospf route
+show ip route rip
+show ip rip status
+show ip rip
 ```
