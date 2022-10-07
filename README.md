@@ -6,8 +6,6 @@
 
 Инструкция может быть применена на хост-машине под управлением Ubuntu подобной ОС.
 
-### Файлы
-
 Необходимые файлы для работы:
 
 ```
@@ -84,7 +82,7 @@ docker exec -it mn.a2 bash
 docker exec -it mn.a3 bash
 ```
 
-#### Запуск OSPF
+### Запуск OSPF
 
 Конфигурация FRR вводится через консол vtysh на каждом из маршрутизаторов r1, r2, r3 соответственно.
 
@@ -150,7 +148,7 @@ docker exec -it mn.a1 bash
 ping -O 10.0.3.100
 ```
 
-В терминале ***containernet>*** разрвать линк r1-r3:
+В терминале *containernet>* разрвать линк r1-r3:
 
 ```
 py net.configLinkStatus('r1','r3','down')
@@ -170,4 +168,67 @@ py net.configLinkStatus('r1','r3','up')
 show ip route
 show ip route ospf
 show ip ospf neighbor
+show ip ospf route
+```
+
+### Запуск RIP
+
+Остановить *containernet>* (просто ввести *exit*) и запустить его заново той же командой.
+
+Конфигурация FRR для RIP:
+
+**r1**
+
+```
+docker exec -it mn.r1 bash
+vtysh
+conf t
+router rip
+ network 10.0.1.0/24
+ network 192.168.12.0/29
+ network 192.168.13.0/29
+ passive-interface r1-eth0
+ exit
+exit
+```
+
+**r2**
+
+```
+docker exec -it mn.r2 bash
+vtysh
+conf t
+router rip
+ network 10.0.2.0/24
+ network 192.168.12.0/29
+ network 192.168.23.0/29
+ passive-interface r2-eth0
+ exit
+exit
+```
+
+**r3**
+
+```
+docker exec -it mn.r3 bash
+vtysh
+conf t
+router rip
+ network 10.0.3.0/24
+ network 192.168.23.0/29
+ network 192.168.13.0/29
+ passive-interface r3-eth0
+ exit
+exit
+```
+
+Тесты можно провести точно так же, как для OSPF. Нужно учесть, что сходимость протокола RIP гораздо медленней и восстановление связи после разрывов будут происходить через несколько секунд.
+
+#### Команды vtysh для RIP
+
+```
+show ip route
+show ip route ospf
+show ip ospf neighbor
+show ip ospf route
 ```
