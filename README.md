@@ -139,4 +139,35 @@ interface r3-eth0
 exit
 ```
 
+#### Тест OSPF
 
+Для проверки работы резервирования можно разорвать линк между парой маршрутизаторов. Например, между r1 и r3.
+
+Открыть терминал a1 и запустить ping на a3:
+
+```
+docker exec -it mn.a1 bash
+ping -O 10.0.3.100
+```
+
+В терминале ***containernet>*** разрвать линк r1-r3:
+
+```
+py net.configLinkStatus('r1','r3','down')
+```
+
+Убедиться, что связь a1 <-> a3 не разорвалась.
+
+Восстановить линк r1-r3:
+
+```
+py net.configLinkStatus('r1','r3','up')
+```
+
+#### Команды vtysh для OSPF
+
+```
+show ip route
+show ip route ospf
+show ip ospf neighbor
+```
