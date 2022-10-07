@@ -69,3 +69,74 @@ docker run --name containernet -it --rm --privileged --pid='host' \
 Будет создан стенд с тремя Astra Linux маршрутизаторами FRR и тремя хостами подключенными к ним.
 
 ![](lab.png)
+
+#### Вход на устройства
+
+Для входа на любое из устройств нужно открыть новый терминал и ввести одну из команд (в зависимости от устройства)
+
+```
+docker exec -it mn.r1 bash
+docker exec -it mn.r2 bash
+docker exec -it mn.r3 bash
+
+docker exec -it mn.a1 bash
+docker exec -it mn.a2 bash
+docker exec -it mn.a3 bash
+```
+
+#### Запуск OSPF
+
+Конфигурация FRR вводится через консол vtysh на каждом из маршрутизаторов r1, r2, r3 соответственно.
+
+**r1**
+
+```
+docker exec -it mn.r1 bash
+vtysh
+conf t
+router ospf
+ network 10.0.1.0/24 area 0
+ network 192.168.12.0/29 area 0
+ network 192.168.13.0/29 area 0
+ exit
+interface r1-eth0
+ ip ospf passive
+ exit
+exit
+```
+
+**r2**
+
+```
+docker exec -it mn.r2 bash
+vtysh
+conf t
+router ospf
+ network 10.0.2.0/24 area 0
+ network 192.168.12.0/29 area 0
+ network 192.168.23.0/29 area 0
+ exit
+interface r2-eth0
+ ip ospf passive
+ exit
+exit
+```
+
+**r3**
+
+```
+docker exec -it mn.r3 bash
+vtysh
+conf t
+router ospf
+ network 10.0.3.0/24 area 0
+ network 192.168.23.0/29 area 0
+ network 192.168.13.0/29 area 0
+ exit
+interface r3-eth0
+ ip ospf passive
+ exit
+exit
+```
+
+
