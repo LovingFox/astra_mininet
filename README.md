@@ -1,63 +1,65 @@
 # Astra Linux mininet container
 
-### Описание
+[Russin version](README.ru.md)
 
-Использование дистрибутива Astra Linux (Orel) в качестве основы для Docker контейнера на стенде mininet. Ноды с Astra Linux в mininet демонстрационного стенда используются в качестве маршрутизаторов с протоколами OSPF и RIP (на основе пакета FRR).
+### Description
 
-Инструкция может быть применена на хост-машине под управлением Ubuntu подобной ОС.
+*Astra Linux (Orel)* distro is used as a base for docker container for *mininet* lab. Nodes with *Astra Linux* are used as routers with OSPF and RIP (*FRR* package).
 
-Необходимые файлы для работы:
+Can be installed on a *Ubuntu* like host machine.
 
-1. build-docker-image.sh (для сборки контейнера Astra Linux)
-2. example.py (для запуска стенда mininet)
+Files:
+
+1. build-docker-image.sh (*Astra Linux* docker image builder)
+2. example.py (*mininet* script)
 
 ```
 git clone https://github.com/LovingFox/astra_mininet.git
 cd astra_mininet
 ```
 
-### Сборка образа Astra Linux
+### Build an Astra Linux Docker container
 
-#### Установка необходимых пакетов
+#### Install packages
 
 ```
 sudo apt-get update
 sudo apt-get install -y docker.io debootstrap
 ```
 
-#### Добавление текущего пользователя в группу docker
+#### Add current user to the group *docker*
 
 ```
 sudo usermod -aG docker $USER
 ```
 
-После этого нужно перелогиниться в систему.
+Re login in to the system to changes applied
 
-#### Создание ссылки на скрипт для сборки редакции Orel
+#### Create a link to the script for Astra Linux Orel distro
 
 ```
 sudo ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/orel
 ```
 
-#### Сборка образа
+#### Build an image
 
 ```
 ./build-docker-image.sh
 ```
 
-В результате работы скрипта будет создан образ astra_linux_ce-frr:2.12, содержащий Astra Linux и пакет FRR.
+The image *astra_linux_ce-frr:2.12* will be created with *FRR* package.
 
-### Запуск mininet
+### Start mininet lab
 
-Контейнеры Docker запускаются при помощи containernet (форк minint).
+Docker containers are launched by *containernet* (*mininet* fork)
 
-#### Скачивание образа containernet
+#### Pull containernet
 
 ```
 docker pull containernet/containernet
 ```
 
-#### Запуск образа containernet
+#### Run containernet
 
 ```
 docker run --name containernet -it --rm --privileged --pid='host' \
@@ -67,13 +69,13 @@ docker run --name containernet -it --rm --privileged --pid='host' \
    python3 /host/example.py
 ```
 
-Будет создан стенд с тремя Astra Linux маршрутизаторами FRR и тремя хостами подключенными к ним.
+The lab is created with three *Astra Linux* routers (r1, r2, r3) and three hosts connected to them (a1, a2, a3).
 
 ![](lab.png)
 
-#### Вход на устройства
+#### Login in to the lab node
 
-Для входа на любое из устройств нужно открыть новый терминал и ввести одну из команд (в зависимости от устройства)
+To login in to any node open new terminal and type the command depended on node.
 
 ```
 docker exec -it mn.r1 bash
@@ -85,9 +87,9 @@ docker exec -it mn.a2 bash
 docker exec -it mn.a3 bash
 ```
 
-### Запуск OSPF
+### Start OSPF
 
-Конфигурация FRR вводится через консол vtysh на каждом из маршрутизаторов r1, r2, r3 соответственно.
+*FRR* configuration is typed commands via *vtysh* on every router r1, r2, r3 respectively.
 
 **r1**
 
@@ -140,32 +142,32 @@ interface r3-eth0
 exit
 ```
 
-#### Тест OSPF
+#### OSPF test
 
-Для проверки работы резервирования можно разорвать линк между парой маршрутизаторов. Например, между r1 и r3.
+Break the connection of a couple routers for a test. For example link r1-r3.
 
-Открыть терминал a1 и запустить ping на a3:
+Open terminal a1 and start *ping* to a3:
 
 ```
 docker exec -it mn.a1 bash
 ping -O 10.0.3.100
 ```
 
-В терминале *containernet>* разрвать линк r1-r3:
+In terminal *containernet>* break the linke r1-r3:
 
 ```
 py net.configLinkStatus('r1','r3','down')
 ```
 
-Убедиться, что связь a1 <-> a3 не разорвалась.
+Ensure the connection a1 <-> a3 is broken but ping is continue successfully.
 
-Восстановить линк r1-r3:
+For recover link r1-r3 use this command:
 
 ```
 py net.configLinkStatus('r1','r3','up')
 ```
 
-#### Команды vtysh для OSPF
+#### vtysh commands for OSPF
 
 ```
 show ip route
@@ -174,11 +176,11 @@ show ip ospf neighbor
 show ip ospf route
 ```
 
-### Запуск RIP
+### Start RIP
 
-Остановить *containernet>* (просто ввести *exit*) и запустить его заново той же командой.
+Stop *containernet>* (just type *exit*) and run it again the same command.
 
-Конфигурация FRR для RIP:
+*FRR* for RIP:
 
 **r1**
 
@@ -225,9 +227,9 @@ router rip
 exit
 ```
 
-Тесты можно провести точно так же, как для OSPF. Нужно учесть, что сходимость протокола RIP гораздо медленней и восстановление связи после разрывов будут происходить через несколько секунд.
+Do tests the same way as for OSPF. It must be taken into account that the convergence of the RIP protocol is much slower and the restoration of connectivity after breaks will occur in a few seconds.
 
-#### Команды vtysh для RIP
+#### vtysh commands for RIP
 
 ```
 show ip route
